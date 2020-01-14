@@ -4,6 +4,8 @@ import org.jsoup.Jsoup;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class TargetServiceImpl implements TargetService {
@@ -39,5 +41,23 @@ public class TargetServiceImpl implements TargetService {
         }
 
         return itemCounter;
+    }
+
+    @Override
+    public List<String> getVariants() throws IOException {
+        String targetUrl = "https://yummyanime.club/catalog/item/kod-gias-vosstavshij-lelush-r2";
+        List<String> variants = new ArrayList<>();
+
+        String[] lines = Jsoup.connect(targetUrl).get().html().split("\n");
+
+        for (String line : lines) {
+            if (line.toLowerCase().contains("плеер") && line.toLowerCase().contains("озвучка")) {
+                String playerVar = line.substring(line.indexOf("П"), line.indexOf("."));
+                String voiceVar = line.substring(line.indexOf("О"));
+                variants.add(playerVar + " " + voiceVar);
+            }
+        }
+
+        return variants;
     }
 }

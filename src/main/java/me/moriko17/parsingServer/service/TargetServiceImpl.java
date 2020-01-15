@@ -9,9 +9,10 @@ import java.util.List;
 
 @Service
 public class TargetServiceImpl implements TargetService {
+    private String yummyRoot = "https://yummyanime.club/catalog/item/";
     @Override
     public int getItemsCount(String targetUrl, String targetPlayer, String targetVoice) throws IOException {
-        String[] lines = Jsoup.connect(targetUrl).get().html().split("\n");
+        String[] lines = Jsoup.connect(yummyRoot + targetUrl).get().html().split("\n");
 
         int startLine = -1;
         for (int i = 0; i < lines.length; i++) {
@@ -42,9 +43,8 @@ public class TargetServiceImpl implements TargetService {
     @Override
     public List<String> getVariants(String targetUrl) throws IOException {
         List<String> variants = new ArrayList<>();
-        String rootString = "https://yummyanime.club/catalog/item/";
 
-        String[] lines = Jsoup.connect(rootString + targetUrl).get().html().split("\n");
+        String[] lines = Jsoup.connect(yummyRoot + targetUrl).get().html().split("\n");
 
         for (String line : lines) {
             if (line.toLowerCase().contains("плеер") && line.toLowerCase().contains("озвучка")) {
@@ -54,7 +54,6 @@ public class TargetServiceImpl implements TargetService {
             }
         }
 
-        System.out.println(variants.size());
         return variants;
     }
 }

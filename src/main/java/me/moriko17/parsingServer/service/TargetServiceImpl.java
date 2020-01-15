@@ -40,8 +40,7 @@ public class TargetServiceImpl implements TargetService {
     }
 
     @Override
-    public List<String> getVariants() throws IOException {
-        String targetUrl = "https://yummyanime.club/catalog/item/kod-gias-vosstavshij-lelush-r2";
+    public List<String> getVariants(String targetUrl) throws IOException {
         List<String> variants = new ArrayList<>();
 
         String[] lines = Jsoup.connect(targetUrl).get().html().split("\n");

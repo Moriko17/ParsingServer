@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface TargetService {
     int getItemsCount(String targetUrl, String targetPlayer, String targetVoice) throws IOException;
-    List<String> getVariants() throws IOException;
+    List<String> getVariants(String targetUrl) throws IOException;
 }

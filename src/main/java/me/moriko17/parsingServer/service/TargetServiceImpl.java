@@ -42,8 +42,9 @@ public class TargetServiceImpl implements TargetService {
     @Override
     public List<String> getVariants(String targetUrl) throws IOException {
         List<String> variants = new ArrayList<>();
+        String rootString = "https://yummyanime.club/catalog/item/";
 
-        String[] lines = Jsoup.connect(targetUrl).get().html().split("\n");
+        String[] lines = Jsoup.connect(rootString + targetUrl).get().html().split("\n");
 
         for (String line : lines) {
             if (line.toLowerCase().contains("плеер") && line.toLowerCase().contains("озвучка")) {
@@ -53,6 +54,7 @@ public class TargetServiceImpl implements TargetService {
             }
         }
 
+        System.out.println(variants.size());
         return variants;
     }
 }

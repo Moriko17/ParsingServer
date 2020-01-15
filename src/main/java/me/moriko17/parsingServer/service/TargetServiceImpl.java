@@ -10,11 +10,7 @@ import java.util.List;
 @Service
 public class TargetServiceImpl implements TargetService {
     @Override
-    public int getItemsCount(String url) throws IOException {
-        String targetUrl = "https://yummyanime.club/catalog/item/igra-na-vyzhivanie";
-        String targetPlayer = "kodik";
-        String targetVoice = "anilibria";
-
+    public int getItemsCount(String targetUrl, String targetPlayer, String targetVoice) throws IOException {
         String[] lines = Jsoup.connect(targetUrl).get().html().split("\n");
 
         int startLine = -1;

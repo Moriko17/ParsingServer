@@ -3,6 +3,7 @@ package me.moriko17.parsingServer.controller;
 import me.moriko17.parsingServer.service.TargetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -18,12 +19,14 @@ public class TargetController {
     }
 
     @GetMapping("/target")
-    public int getItemsCount(String url) throws IOException {
-        return targetService.getItemsCount("");
+    public int getItemsCount(@RequestBody String targetUrl,
+                             @RequestBody String targetPlayer,
+                             @RequestBody String targetVoice) throws IOException {
+        return targetService.getItemsCount(targetUrl, targetPlayer, targetVoice);
     }
 
     @GetMapping("/targetVar")
-    public List<String> getVariants() throws IOException {
-        return targetService.getVariants();
+    public List<String> getVariants(@RequestBody String targetUrl) throws IOException {
+        return targetService.getVariants(targetUrl);
     }
 }

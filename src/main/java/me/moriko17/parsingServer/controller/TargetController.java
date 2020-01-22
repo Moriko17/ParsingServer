@@ -39,4 +39,9 @@ public class TargetController {
     public List<AnimeDto> fetchSubscribeList() {
         return targetService.fetchSubscribeList();
     }
+
+    @GetMapping("/subscribe/{id}")
+    public int getItemsCount(@PathVariable(value = "id") Long id) throws IOException {
+        return targetService.getItemsCount(id);
+    }
 }

@@ -52,6 +52,13 @@ public class TargetServiceImpl implements TargetService {
     }
 
     @Override
+    public int getItemsCount(Long id) throws IOException {
+        AnimeEntity animeEntity = animeRepository.findById(id).orElseThrow(RuntimeException::new);
+
+        return getItemsCount(animeEntity.getTargetUrl(), animeEntity.getTargetPlayer(), animeEntity.getTargetVoice());
+    }
+
+    @Override
     public List<String> getVariants(String targetUrl) throws IOException {
         List<String> variants = new ArrayList<>();
 

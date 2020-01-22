@@ -15,14 +15,26 @@ import javax.validation.constraints.NotNull;
 @Setter
 @Table(name = "Anime")
 public class AnimeEntity {
+    public AnimeEntity(@NotNull @NotBlank String targetUrl,
+                       @NotNull @NotBlank String targetPlayer,
+                       @NotNull @NotBlank String targetVoice) {
+        this.targetUrl = targetUrl;
+        this.targetPlayer = targetPlayer;
+        this.targetVoice = targetVoice;
+    }
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Setter(AccessLevel.NONE)
     private Long id;
 
+//    @NotNull
+//    @NotBlank
+//    private String title;
+
     @NotNull
     @NotBlank
-    private String title;
+    private String targetUrl;
 
     @NotNull
     @NotBlank

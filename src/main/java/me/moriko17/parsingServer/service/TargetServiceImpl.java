@@ -1,6 +1,11 @@
 package me.moriko17.parsingServer.service;
 
+import me.moriko17.parsingServer.domain.AnimeEntity;
+import me.moriko17.parsingServer.models.AnimeDto;
+import me.moriko17.parsingServer.models.AnimeToSubscribe;
+import me.moriko17.parsingServer.repository.AnimeRepository;
 import org.jsoup.Jsoup;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -10,6 +15,12 @@ import java.util.List;
 @Service
 public class TargetServiceImpl implements TargetService {
     private String yummyRoot = "https://yummyanime.club/catalog/item/";
+    private AnimeRepository animeRepository;
+    @Autowired
+    public TargetServiceImpl(AnimeRepository animeRepository) {
+        this.animeRepository = animeRepository;
+    }
+
     @Override
     public int getItemsCount(String targetUrl, String targetPlayer, String targetVoice) throws IOException {
         String[] lines = Jsoup.connect(yummyRoot + targetUrl).get().html().split("\n");
@@ -55,5 +66,23 @@ public class TargetServiceImpl implements TargetService {
         }
 
         return variants;
+    }
+
+    @Override
+    public Long titleSubscribe(AnimeToSubscribe animeToSubscribe) {
+        AnimeEntity animeEntity = new AnimeEntity(animeToSubscribe.getTargetUrl(),
+                animeToSubscribe.getTargetPlayer(),
+                animeToSubscribe.getTargetVoice());
+        animeRepository.save(animeEntity);
+
+        return animeEntity.getId();
+    }
+
+    @Override
+    public List<AnimeDto> fetchSubscribeList() {
+        List<AnimeDto> subscribes = new ArrayList<>();
+        animeRepository.findAll().forEach(animeEntity -> subscribes.add(new AnimeDto(animeEntity)));
+
+        return subscribes;
     }
 }

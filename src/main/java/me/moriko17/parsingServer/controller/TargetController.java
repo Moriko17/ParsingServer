@@ -1,5 +1,7 @@
 package me.moriko17.parsingServer.controller;
 
+import me.moriko17.parsingServer.models.AnimeDto;
+import me.moriko17.parsingServer.models.AnimeToSubscribe;
 import me.moriko17.parsingServer.service.TargetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,5 +28,15 @@ public class TargetController {
     @GetMapping("/targetVar")
     public List<String> getVariants(@RequestParam String targetUrl) throws IOException {
         return targetService.getVariants(targetUrl);
+    }
+
+    @PostMapping("/subscribe")
+    public Long titleSubscribe(@RequestBody AnimeToSubscribe animeToSubscribe) {
+        return targetService.titleSubscribe(animeToSubscribe);
+    }
+
+    @GetMapping("/subscribe")
+    public List<AnimeDto> fetchSubscribeList() {
+        return targetService.fetchSubscribeList();
     }
 }

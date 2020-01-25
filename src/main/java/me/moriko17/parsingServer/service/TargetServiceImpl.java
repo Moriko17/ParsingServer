@@ -76,13 +76,42 @@ public class TargetServiceImpl implements TargetService {
     }
 
     @Override
-    public Long titleSubscribe(AnimeToSubscribe animeToSubscribe) {
-        AnimeEntity animeEntity = new AnimeEntity(animeToSubscribe.getTargetUrl(),
+    public Long titleSubscribe(AnimeToSubscribe animeToSubscribe) throws IOException {
+        String[] lines = Jsoup.connect(yummyRoot + animeToSubscribe.getTargetUrl()).get().html().split("\n");
+
+        String title = "";
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].toLowerCase().contains("<h1>")) {
+                title = lines[i].substring(lines[i].indexOf(">") + 2, lines[i].lastIndexOf("<") - 1);
+                System.out.println(title);
+                break;
+            }
+        }
+        String imgSource = "";
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].toLowerCase().contains("poster-block")) {
+                imgSource = lines[i+1].substring(lines[i+1].indexOf("/"), lines[i+1].lastIndexOf("g") + 1);
+                System.out.println(imgSource);
+                break;
+            }
+        }
+
+        int itemCounter = getItemsCount(animeToSubscribe.getTargetUrl(),
                 animeToSubscribe.getTargetPlayer(),
                 animeToSubscribe.getTargetVoice());
+        System.out.println(itemCounter);
+
+        AnimeEntity animeEntity = new AnimeEntity(animeToSubscribe, title, imgSource, itemCounter);
         animeRepository.save(animeEntity);
 
         return animeEntity.getId();
+    }
+
+    @Override
+    public Long titleUnsubscribe(Long id) {
+        animeRepository.deleteById(id);
+
+        return id;
     }
 
     @Override

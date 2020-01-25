@@ -16,10 +16,18 @@ public class AnimeDto {
         this.targetUrl = animeEntity.getTargetUrl();
         this.targetPlayer = animeEntity.getTargetPlayer();
         this.targetVoice = animeEntity.getTargetVoice();
+        this.title = animeEntity.getTitle();
+        this.imgSource = animeEntity.getImgSource();
+        this.viewedCounter = animeEntity.getViewedCounter();
+        this.itemsCounter = animeEntity.getItemsCounter();
     }
 
     private Long id;
     private String targetUrl;
     private String targetPlayer;
     private String targetVoice;
+    private String title;
+    private String imgSource;
+    private int viewedCounter;
+    private int itemsCounter;
 }

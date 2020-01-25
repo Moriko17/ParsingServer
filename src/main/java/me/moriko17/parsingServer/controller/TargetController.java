@@ -31,7 +31,7 @@ public class TargetController {
     }
 
     @PostMapping("/subscribe")
-    public Long titleSubscribe(@RequestBody AnimeToSubscribe animeToSubscribe) {
+    public Long titleSubscribe(@RequestBody AnimeToSubscribe animeToSubscribe) throws IOException {
         return targetService.titleSubscribe(animeToSubscribe);
     }
 
@@ -43,5 +43,10 @@ public class TargetController {
     @GetMapping("/subscribe/{id}")
     public int getItemsCount(@PathVariable(value = "id") Long id) throws IOException {
         return targetService.getItemsCount(id);
+    }
+
+    @DeleteMapping("/subscribe/{id}")
+    public Long titleUnsubscribe(@PathVariable(value = "id") Long id) {
+        return targetService.titleUnsubscribe(id);
     }
 }

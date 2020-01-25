@@ -10,6 +10,7 @@ public interface TargetService {
     int getItemsCount(String targetUrl, String targetPlayer, String targetVoice) throws IOException;
     int getItemsCount(Long id) throws IOException;
     List<String> getVariants(String targetUrl) throws IOException;
-    Long titleSubscribe(AnimeToSubscribe animeToSubscribe);
+    Long titleSubscribe(AnimeToSubscribe animeToSubscribe) throws IOException;
     List<AnimeDto> fetchSubscribeList();
+    Long titleUnsubscribe(Long id);
 }

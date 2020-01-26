@@ -1,8 +1,10 @@
 package me.moriko17.parsingServer.service;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import me.moriko17.parsingServer.domain.AnimeEntity;
 import me.moriko17.parsingServer.models.AnimeDto;
 import me.moriko17.parsingServer.models.AnimeToSubscribe;
+import me.moriko17.parsingServer.models.ParseResultDto;
 import me.moriko17.parsingServer.repository.AnimeRepository;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,36 +25,13 @@ public class TargetServiceImpl implements TargetService {
 
     @Override
     public int getItemsCount(String targetUrl, String targetPlayer, String targetVoice) throws IOException {
-        String[] lines = Jsoup.connect(yummyRoot + targetUrl).get().html().split("\n");
+        ParseResultDto parseResultDto = parse(targetUrl, targetPlayer, targetVoice);
 
-        int startLine = -1;
-        for (int i = 0; i < lines.length; i++) {
-            if (lines[i].toLowerCase().contains(targetPlayer) && lines[i].toLowerCase().contains(targetVoice)) {
-                startLine = i;
-                break;
-            }
-        }
-
-        if (startLine == -1) return -1;
-        int currentLineNumber = startLine + 5;
-        int openDivCount = 0;
-        int itemCounter = 0;
-        while (true) {
-            if (lines[currentLineNumber].contains("<div")) openDivCount++;
-            if (lines[currentLineNumber].contains("</div>")) openDivCount--;
-            itemCounter++;
-            currentLineNumber++;
-            if (openDivCount == 0) {
-                itemCounter = (itemCounter - 1) / 3;
-                break;
-            }
-        }
-
-        return itemCounter;
+        return parseResultDto.getItemsCounter();
     }
 
     @Override
-    public int getItemsCount(Long id) throws IOException {
+    public int getItemsCount(Long id) throws IOException, UnirestException {
         AnimeEntity animeEntity = animeRepository.findById(id).orElseThrow(RuntimeException::new);
 
         return getItemsCount(animeEntity.getTargetUrl(), animeEntity.getTargetPlayer(), animeEntity.getTargetVoice());
@@ -76,7 +55,7 @@ public class TargetServiceImpl implements TargetService {
     }
 
     @Override
-    public Long titleSubscribe(AnimeToSubscribe animeToSubscribe) throws IOException {
+    public Long titleSubscribe(AnimeToSubscribe animeToSubscribe) throws IOException, UnirestException {
         String[] lines = Jsoup.connect(yummyRoot + animeToSubscribe.getTargetUrl()).get().html().split("\n");
 
         String title = "";
@@ -120,5 +99,46 @@ public class TargetServiceImpl implements TargetService {
         animeRepository.findAll().forEach(animeEntity -> subscribes.add(new AnimeDto(animeEntity)));
 
         return subscribes;
+    }
+
+    private ParseResultDto parse(String targetUrl, String targetPlayer, String targetVoice) throws IOException {
+        String[] lines = Jsoup.connect(yummyRoot + targetUrl).get().html().split("\n");
+
+        int startLine = -1;
+        String title = "";
+        String imgSource = "";
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].toLowerCase().contains(targetPlayer.toLowerCase())
+                    && lines[i].toLowerCase().contains(targetVoice.toLowerCase())) {
+                startLine = i;
+            }
+            if (lines[i].toLowerCase().contains("<h1>")) {
+                title = lines[i].substring(lines[i].indexOf(">") + 2, lines[i].lastIndexOf("<") - 1);
+            }
+            if (lines[i].toLowerCase().contains("poster-block")) {
+                int rightString = i+1;
+                while (!lines[rightString].contains(".jpg")) {
+                    rightString++;
+                }
+                imgSource = lines[rightString].substring(lines[rightString].indexOf("/"),
+                        lines[rightString].lastIndexOf("g") + 1);
+            }
+        }
+
+        int currentLineNumber = startLine + 5;
+        int openDivCount = 0;
+        int itemCounter = 0;
+        while (true) {
+            if (lines[currentLineNumber].contains("<div")) openDivCount++;
+            if (lines[currentLineNumber].contains("</div>")) openDivCount--;
+            itemCounter++;
+            currentLineNumber++;
+            if (openDivCount == 0) {
+                itemCounter = (itemCounter - 1) / 3;
+                break;
+            }
+        }
+
+        return new ParseResultDto(targetUrl, targetPlayer, targetVoice, title, imgSource, itemCounter);
     }
 }

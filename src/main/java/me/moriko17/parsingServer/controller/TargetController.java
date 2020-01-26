@@ -1,5 +1,6 @@
 package me.moriko17.parsingServer.controller;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import me.moriko17.parsingServer.models.AnimeDto;
 import me.moriko17.parsingServer.models.AnimeToSubscribe;
 import me.moriko17.parsingServer.service.TargetService;
@@ -21,7 +22,7 @@ public class TargetController {
     @GetMapping("/target")
     public int getItemsCount(@RequestParam String targetUrl,
                              @RequestParam String targetPlayer,
-                             @RequestParam String targetVoice) throws IOException {
+                             @RequestParam String targetVoice) throws IOException, UnirestException {
         return targetService.getItemsCount(targetUrl, targetPlayer, targetVoice);
     }
 
@@ -31,7 +32,7 @@ public class TargetController {
     }
 
     @PostMapping("/subscribe")
-    public Long titleSubscribe(@RequestBody AnimeToSubscribe animeToSubscribe) throws IOException {
+    public Long titleSubscribe(@RequestBody AnimeToSubscribe animeToSubscribe) throws IOException, UnirestException {
         return targetService.titleSubscribe(animeToSubscribe);
     }
 
@@ -41,7 +42,7 @@ public class TargetController {
     }
 
     @GetMapping("/subscribe/{id}")
-    public int getItemsCount(@PathVariable(value = "id") Long id) throws IOException {
+    public int getItemsCount(@PathVariable(value = "id") Long id) throws IOException, UnirestException {
         return targetService.getItemsCount(id);
     }
 

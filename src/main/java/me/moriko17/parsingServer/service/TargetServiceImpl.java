@@ -1,11 +1,10 @@
 package me.moriko17.parsingServer.service;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
-import me.moriko17.parsingServer.domain.AnimeEntity;
-import me.moriko17.parsingServer.models.AnimeDto;
+import me.moriko17.parsingServer.domain.SubscribeEntity;
+import me.moriko17.parsingServer.models.SubscribeDto;
 import me.moriko17.parsingServer.models.AnimeToSubscribe;
 import me.moriko17.parsingServer.models.ParseResultDto;
-import me.moriko17.parsingServer.repository.AnimeRepository;
+import me.moriko17.parsingServer.repository.SubscribeRepository;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,86 +16,37 @@ import java.util.List;
 @Service
 public class TargetServiceImpl implements TargetService {
     private String yummyRoot = "https://yummyanime.club/catalog/item/";
-    private AnimeRepository animeRepository;
+    private SubscribeRepository subscribeRepository;
     @Autowired
-    public TargetServiceImpl(AnimeRepository animeRepository) {
-        this.animeRepository = animeRepository;
+    public TargetServiceImpl(SubscribeRepository subscribeRepository) {
+        this.subscribeRepository = subscribeRepository;
     }
 
     @Override
-    public int getItemsCount(String targetUrl, String targetPlayer, String targetVoice) throws IOException {
-        ParseResultDto parseResultDto = parse(targetUrl, targetPlayer, targetVoice);
-
-        return parseResultDto.getItemsCounter();
-    }
-
-    @Override
-    public int getItemsCount(Long id) throws IOException, UnirestException {
-        AnimeEntity animeEntity = animeRepository.findById(id).orElseThrow(RuntimeException::new);
-
-        return getItemsCount(animeEntity.getTargetUrl(), animeEntity.getTargetPlayer(), animeEntity.getTargetVoice());
-    }
-
-    @Override
-    public List<String> getVariants(String targetUrl) throws IOException {
-        List<String> variants = new ArrayList<>();
-
-        String[] lines = Jsoup.connect(yummyRoot + targetUrl).get().html().split("\n");
-
-        for (String line : lines) {
-            if (line.toLowerCase().contains("плеер") && line.toLowerCase().contains("озвучка")) {
-                String playerVar = line.substring(line.indexOf("П"), line.indexOf("."));
-                String voiceVar = line.substring(line.indexOf("О"));
-                variants.add(playerVar + " " + voiceVar);
-            }
-        }
-
-        return variants;
-    }
-
-    @Override
-    public Long titleSubscribe(AnimeToSubscribe animeToSubscribe) throws IOException, UnirestException {
-        String[] lines = Jsoup.connect(yummyRoot + animeToSubscribe.getTargetUrl()).get().html().split("\n");
-
-        String title = "";
-        for (int i = 0; i < lines.length; i++) {
-            if (lines[i].toLowerCase().contains("<h1>")) {
-                title = lines[i].substring(lines[i].indexOf(">") + 2, lines[i].lastIndexOf("<") - 1);
-                System.out.println(title);
-                break;
-            }
-        }
-        String imgSource = "";
-        for (int i = 0; i < lines.length; i++) {
-            if (lines[i].toLowerCase().contains("poster-block")) {
-                imgSource = lines[i+1].substring(lines[i+1].indexOf("/"), lines[i+1].lastIndexOf("g") + 1);
-                System.out.println(imgSource);
-                break;
-            }
-        }
-
-        int itemCounter = getItemsCount(animeToSubscribe.getTargetUrl(),
+    public Long subscribe(AnimeToSubscribe animeToSubscribe) throws IOException {
+        ParseResultDto parseResultDto = parse(animeToSubscribe.getTargetUrl(),
                 animeToSubscribe.getTargetPlayer(),
                 animeToSubscribe.getTargetVoice());
-        System.out.println(itemCounter);
+        SubscribeEntity subscribeEntity = new SubscribeEntity(animeToSubscribe,
+                parseResultDto.getTitle(),
+                parseResultDto.getImgSource(),
+                parseResultDto.getItemsCounter());
+        subscribeRepository.save(subscribeEntity);
 
-        AnimeEntity animeEntity = new AnimeEntity(animeToSubscribe, title, imgSource, itemCounter);
-        animeRepository.save(animeEntity);
-
-        return animeEntity.getId();
+        return subscribeEntity.getId();
     }
 
     @Override
-    public Long titleUnsubscribe(Long id) {
-        animeRepository.deleteById(id);
+    public Long unsubscribe(Long id) {
+        subscribeRepository.deleteById(id);
 
         return id;
     }
 
     @Override
-    public List<AnimeDto> fetchSubscribeList() {
-        List<AnimeDto> subscribes = new ArrayList<>();
-        animeRepository.findAll().forEach(animeEntity -> subscribes.add(new AnimeDto(animeEntity)));
+    public List<SubscribeDto> getSubscribes() {
+        List<SubscribeDto> subscribes = new ArrayList<>();
+        subscribeRepository.findAll().forEach(subscribeEntity -> subscribes.add(new SubscribeDto(subscribeEntity)));
 
         return subscribes;
     }
@@ -124,6 +74,8 @@ public class TargetServiceImpl implements TargetService {
                         lines[rightString].lastIndexOf("g") + 1);
             }
         }
+
+        if (startLine == -1) throw new NullPointerException("No such combination");
 
         int currentLineNumber = startLine + 5;
         int openDivCount = 0;

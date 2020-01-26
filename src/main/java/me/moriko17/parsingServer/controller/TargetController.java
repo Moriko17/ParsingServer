@@ -1,7 +1,6 @@
 package me.moriko17.parsingServer.controller;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
-import me.moriko17.parsingServer.models.AnimeDto;
+import me.moriko17.parsingServer.models.SubscribeDto;
 import me.moriko17.parsingServer.models.AnimeToSubscribe;
 import me.moriko17.parsingServer.service.TargetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,35 +18,18 @@ public class TargetController {
         this.targetService = targetService;
     }
 
-    @GetMapping("/target")
-    public int getItemsCount(@RequestParam String targetUrl,
-                             @RequestParam String targetPlayer,
-                             @RequestParam String targetVoice) throws IOException, UnirestException {
-        return targetService.getItemsCount(targetUrl, targetPlayer, targetVoice);
-    }
-
-    @GetMapping("/targetVar")
-    public List<String> getVariants(@RequestParam String targetUrl) throws IOException {
-        return targetService.getVariants(targetUrl);
-    }
-
     @PostMapping("/subscribe")
-    public Long titleSubscribe(@RequestBody AnimeToSubscribe animeToSubscribe) throws IOException, UnirestException {
-        return targetService.titleSubscribe(animeToSubscribe);
+    public Long subscribe(@RequestBody AnimeToSubscribe animeToSubscribe) throws IOException {
+        return targetService.subscribe(animeToSubscribe);
     }
 
     @GetMapping("/subscribe")
-    public List<AnimeDto> fetchSubscribeList() {
-        return targetService.fetchSubscribeList();
-    }
-
-    @GetMapping("/subscribe/{id}")
-    public int getItemsCount(@PathVariable(value = "id") Long id) throws IOException, UnirestException {
-        return targetService.getItemsCount(id);
+    public List<SubscribeDto> getSubscribes() {
+        return targetService.getSubscribes();
     }
 
     @DeleteMapping("/subscribe/{id}")
-    public Long titleUnsubscribe(@PathVariable(value = "id") Long id) {
-        return targetService.titleUnsubscribe(id);
+    public Long unsubscribe(@PathVariable(value = "id") Long id) {
+        return targetService.unsubscribe(id);
     }
 }

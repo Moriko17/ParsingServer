@@ -14,12 +14,12 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "Anime")
-public class AnimeEntity {
-    public AnimeEntity(AnimeToSubscribe animeToSubscribe,
-                       @NotNull @NotBlank String title,
-                       @NotNull @NotBlank String imgSource,
-                       @NotNull int itemsCounter) {
+@Table(name = "Subscribes")
+public class SubscribeEntity {
+    public SubscribeEntity(AnimeToSubscribe animeToSubscribe,
+                           @NotNull @NotBlank String title,
+                           @NotNull @NotBlank String imgSource,
+                           @NotNull int itemsCounter) {
         this.targetVoice = animeToSubscribe.getTargetVoice();
         this.targetPlayer = animeToSubscribe.getTargetPlayer();
         this.targetUrl = animeToSubscribe.getTargetUrl();

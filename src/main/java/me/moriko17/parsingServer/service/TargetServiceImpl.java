@@ -67,7 +67,7 @@ public class TargetServiceImpl implements TargetService {
             }
             if (lines[i].toLowerCase().contains("poster-block")) {
                 int rightString = i+1;
-                while (!lines[rightString].contains(".jpg")) {
+                while (!lines[rightString].contains("img")) {
                     rightString++;
                 }
                 imgSource = lines[rightString].substring(lines[rightString].indexOf("/"),
